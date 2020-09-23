@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Event Platform</title>
+  </head>
+  <body>
+    <div id="app">
+      <div v-if="event">
+        <h1>{{event.name}}</h1>
+        <h2>Your username is {{username}}</h2>
+
+        <div v-if="!session">
+          <ul>
+            <li v-for="table in event.tables">
+              <span @click="joinTable(table.id)">
+                {{table.name}} ({{table.members.length}} people)
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div v-if="session">
+          <button @click="leaveTable">Leave table</button>
+          {{session}}
+        </div>
+      </div>
+      <div v-else>Loading...</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script src="event.js"></script>
+  </body>
+</html>
