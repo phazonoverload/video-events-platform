@@ -11,6 +11,22 @@
         <h1>{{event.name}}</h1>
         <h2>Your username is {{username}}</h2>
 
+        <div id="stage">
+          <div class="controls">
+            <button @click="enterStage" v-if="!session">
+              Enter stage (TODO)
+            </button>
+            <button @click="enterStage" v-if="!session">
+              Enter stage as speaker (TODO)
+            </button>
+            <button @click="leaveTable" v-if="session && onStage">
+              Leave stage
+            </button>
+          </div>
+          <div id="stage-publishers"></div>
+          <div id="stage-subscribers"></div>
+        </div>
+
         <div v-if="!session">
           <ul>
             <li v-for="table in event.tables">
@@ -21,9 +37,10 @@
           </ul>
         </div>
 
-        <div v-if="session">
+        <div v-if="session && !onStage">
           <button @click="leaveTable">Leave table</button>
-          {{session}}
+          <div id="publishers"></div>
+          <div id="subscribers"></div>
         </div>
       </div>
       <div v-else>Loading...</div>

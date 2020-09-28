@@ -11,7 +11,7 @@ const OT = new OpenTok(
 
 module.exports = async (event, context) => {
   try {
-    const { name, tables, code } = JSON.parse(event.body)
+    const { name, tables, code, speaker } = JSON.parse(event.body)
     await mongo.connect()
     const events = await mongo.db('production').collection('events')
     if (await events.findOne({ code })) {
@@ -21,13 +21,15 @@ module.exports = async (event, context) => {
       }
     } else {
       const sessions = []
-      for (let i = 0; i < tables; i++) {
+      for (let i = 1; i <= tables; i++) {
         sessions.push(await createSession(i))
       }
       await events.insertOne({
         name,
         code,
-        tables: sessions
+        speaker,
+        tables: sessions,
+        stage: await createSession()
       })
     }
     return {
@@ -35,6 +37,7 @@ module.exports = async (event, context) => {
       body: JSON.stringify({ message: 'Successfully created event' })
     }
   } catch (err) {
+    console.log(err)
     return { statusCode: 500, body: err.toString() }
   }
 }
@@ -43,7 +46,7 @@ const createSession = async i => {
   return new Promise((resolve, reject) => {
     OT.createSession((error, session) => {
       resolve({
-        name: 'Table ' + (i + 1),
+        name: i ? 'Table ' + i : 'Stage',
         id: session.sessionId,
         members: []
       })

@@ -23,14 +23,3 @@ module.exports = async (event, context) => {
     return { statusCode: 500, body: err.toString() }
   }
 }
-
-const createSession = async i => {
-  return new Promise((resolve, reject) => {
-    OT.createSession((error, session) => {
-      resolve({
-        name: 'Table ' + (i + 1),
-        id: session.sessionId
-      })
-    })
-  })
-}
