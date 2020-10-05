@@ -13,15 +13,9 @@
 
         <div id="stage">
           <div class="controls">
-            <button @click="enterStage" v-if="!session">
-              Enter stage (TODO)
-            </button>
-            <button @click="enterStage" v-if="!session">
-              Enter stage as speaker (TODO)
-            </button>
-            <button @click="leaveTable" v-if="session && onStage">
-              Leave stage
-            </button>
+            <button @click="enterStage" v-if="!session">Enter stage (TODO)</button>
+            <button @click="enterStage(event, 'speaker')" v-if="!session">Enter stage as speaker (TODO)</button>
+            <button @click="leaveTable" v-if="session && onStage">Leave stage</button>
           </div>
           <div id="stage-publishers"></div>
           <div id="stage-subscribers"></div>
@@ -30,9 +24,7 @@
         <div v-if="!session">
           <ul>
             <li v-for="table in event.tables">
-              <span @click="joinTable(table.id)">
-                {{table.name}} ({{table.members.length}} people)
-              </span>
+              <span @click="joinTable(table.id)"> {{table.name}} ({{table.members.length}} people) </span>
             </li>
           </ul>
         </div>
@@ -43,6 +35,7 @@
           <div id="subscribers"></div>
         </div>
       </div>
+
       <div v-else>Loading...</div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>

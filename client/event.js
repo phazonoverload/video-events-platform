@@ -29,31 +29,20 @@ const app = new Vue({
     }
   },
   methods: {
-    createToken(session, speaker = false) {
+    createToken(session, stage = false, password = false) {
       return new Promise(async (resolve, reject) => {
-        const payload = { session }
-        if (speaker) {
-          payload.password = prompt('Please provide the speaker access code')
-        }
-        const data = await fetch('/api/token', {
+        const data = await fetch('/api/tokens', {
           method: 'POST',
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ session, stage, password })
         }).then(r => r.json())
         resolve(data)
       })
     },
-    async joinTable(id, stage = false) {
+    async joinTable(id, password = false) {
       const { token, session, apiKey } = await this.createToken(id)
       this.session = OT.initSession(apiKey, session)
-      if (stage) {
-        this.createPublisher(token, 'stage-publishers')
-        this.session.on('streamCreated', event => {
-          this.streamCreated(event, 'stage-subscribers')
-        })
-      } else {
-        this.createPublisher(token)
-        this.session.on('streamCreated', this.streamCreated)
-      }
+      this.createPublisher(token)
+      this.session.on('streamCreated', this.streamCreated)
     },
     createPublisher(token, el = 'publisher') {
       this.publishers.push(OT.initPublisher(el, { name: this.username }))
@@ -78,18 +67,32 @@ const app = new Vue({
         this.publishers.splice(i, 1)
       }
     },
-    async enterStage() {
-      const { token, session, apiKey, error } = await this.createToken(
-        this.event.stage.id,
-        true
-      )
-      if (error) return alert(error)
-      this.session = OT.initSession(apiKey, session)
-      this.createPublisher(token, 'stage-publishers')
-      this.session.on('streamCreated', event => {
-        this.streamCreated(event, 'stage-subscribers')
-      })
-      this.onStage = true
+    async enterStage(event, speaker = false) {
+      if (!speaker) {
+        const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage')
+        this.session = OT.initSession(apiKey, session)
+        this.session.connect(token)
+        this.session.on('streamCreated', event => {
+          this.streamCreated(event, 'stage-subscribers')
+        })
+        this.onStage = true
+      } else {
+        const password = prompt('Speaker access code')
+        const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
+        if (error) {
+          return alert(error)
+        } else {
+          this.session = OT.initSession(apiKey, session)
+          const camera = this.createPublisher(token, 'stage-publishers')
+          this.session.connect(token, () => {
+            this.session.publish(camera)
+          })
+          this.session.on('streamCreated', event => {
+            this.streamCreated(event, 'stage-subscribers')
+          })
+          this.onStage = true
+        }
+      }
     }
   }
 })
