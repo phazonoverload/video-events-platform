@@ -6,8 +6,7 @@ const app = new Vue({
   methods: {
     async createEvent() {
       const { name, code, tables, speaker } = this.event
-      if (!name || !code || !tables || !speaker)
-        return alert('You must fill in all fields')
+      if (!name || !code || !tables || !speaker || !welcome) return alert('You must fill in all fields')
       fetch('/api/events', {
         method: 'POST',
         body: JSON.stringify(this.event)

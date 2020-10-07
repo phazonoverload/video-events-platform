@@ -1,0 +1,140 @@
+:root {
+  --purple: #584fa8;
+  --magenta: #d83b9e;
+  --cyan: #80d0f0;
+  --orange: #ff6f50;
+  --peach: #ffa48e;
+  --gray-1: #d9e2e8;
+  --gray-2: #bfc9d0;
+  --gray-3: #7d8e94;
+  --gray-4: #49555d;
+  --lg-width: 960px;
+  --font: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font);
+}
+
+.w {
+  max-width: var(--lg-width);
+  padding-left: 1em;
+  padding-right: 1em;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.w .w {
+  padding-left: auto;
+  padding-right: auto;
+}
+
+.btn {
+  background: black;
+  color: white;
+  border: none;
+  font-size: 0.75em;
+  padding: 0.5em 0.75em;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+}
+
+.btn.white {
+  background: white;
+  color: black;
+}
+
+/* HEADER */
+
+header {
+  background: black;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+header * {
+  color: white;
+  font-size: 1em;
+  margin-left: 1em;
+  padding: 1em 0;
+  display: inline-block;
+}
+
+@media screen and (max-width: 800px) {
+  header {
+    flex-direction: column;
+    padding: 0.5em 0;
+  }
+  header * {
+    margin-left: 0;
+    padding: 0.25em;
+  }
+}
+
+/* LOBBY */
+
+#lobby {
+  padding-top: 2em;
+  padding-bottom: 2em;
+}
+
+#lobby .intro {
+  text-align: center;
+}
+
+#lobby .intro p {
+  margin: 1rem 0 2rem;
+}
+
+#lobby .stage {
+  background: var(--cyan);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  border-radius: 0.5em;
+  margin: 1em 0;
+}
+
+#lobby .stage button {
+  margin: 1em;
+}
+
+#lobby .tables {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 2em;
+}
+
+#lobby .table {
+  list-style-type: none;
+  border-radius: 20px;
+  padding: 2em;
+  box-shadow: 0.5rem 0.5rem 0 0 var(--magenta);
+}
+
+#lobby .table button {
+  margin-top: 1em;
+}
+
+@media screen and (max-width: 800px) {
+  #lobby .tables {
+    grid-template-columns: 1fr;
+    margin-right: 1rem;
+  }
+}
+
+/* TABLE */
+
+.nav.btn {
+  margin: 1em 0;
+}

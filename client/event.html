@@ -4,32 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Event Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300&family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
     <div id="app">
       <div v-if="event">
-        <h1>{{event.name}}</h1>
-        <h2>Your username is {{username}}</h2>
-        <h3>View: {{view}}</h3>
 
-        <div v-if="view == 'lobby'">
-          <button @click="enterStage">Enter stage</button>
-          <button @click="enterStage(event, 'speaker')">Enter stage as speaker</button>
-          <ul>
-            <li v-for="table in event.tables">
-              <span @click="joinTable(table.id)"> {{table.name}} ({{table.members.length}} people) </span>
+        <header>
+          <h1>{{event.name}}</h1>
+          <span>Your username is {{username}}</span>
+          <span>View: {{view}}</span>
+        </header>
+
+
+        <div id="lobby" class="w" v-if="view == 'lobby'">
+          <div class="intro">
+            <h2>Welcome to {{event.name}}!</h2>
+            <p>{{event.welcome}}</p>
+          </div>
+          <div class="stage">
+            <button class="btn white" @click="enterStage">Enter stage</button>
+            <button class="btn white" @click="enterStage(event, 'speaker')">Enter stage as speaker</button>
+          </div>
+          <ul class="tables">
+            <li class="table" v-for="table in event.tables">
+              <h3>{{table.name}}</h3>
+              <button class="btn" @click="joinTable(table.id)">Go to table</button>
             </li>
           </ul>
         </div>
 
-        <div v-if="view == 'table'">
-          <button @click="returnToLobby">Return to lobby</button>
+        <div class="w" v-if="view == 'table'">
+          <button class="nav btn" @click="returnToLobby">Return to lobby</button>
           <div id="publishers"></div>
           <div id="subscribers"></div>
         </div>
 
         <div v-if="view == 'stage'">
-          <button @click="returnToLobby">Return to lobby</button>
+          <button class="nav btn" @click="returnToLobby">Return to lobby</button>
           <div id="publishers"></div>
           <div id="subscribers"></div>
           <div class="controls" v-if="speaker">

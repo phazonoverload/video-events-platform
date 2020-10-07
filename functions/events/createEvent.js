@@ -4,14 +4,11 @@ const mongo = new MongoClient(process.env.MONGODB_URL, {
   useUnifiedTopology: true
 })
 const OpenTok = require('opentok')
-const OT = new OpenTok(
-  process.env.VONAGE_API_KEY,
-  process.env.VONAGE_API_SECRET
-)
+const OT = new OpenTok(process.env.VONAGE_API_KEY, process.env.VONAGE_API_SECRET)
 
 module.exports = async (event, context) => {
   try {
-    const { name, tables, code, speaker } = JSON.parse(event.body)
+    const { name, tables, code, speaker, welcome } = JSON.parse(event.body)
     await mongo.connect()
     const events = await mongo.db('production').collection('events')
     if (await events.findOne({ code })) {
@@ -29,6 +26,7 @@ module.exports = async (event, context) => {
         code,
         speaker,
         tables: sessions,
+        welcome,
         stage: await createSession()
       })
     }
