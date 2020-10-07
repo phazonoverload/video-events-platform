@@ -35,9 +35,11 @@ const app = new Vue({
       })
     },
     createPublisher(el = 'publishers') {
-      const publisher = OT.initPublisher(el, { name: this.username })
-      this.publishers.push(publisher)
-      this.session.publish(this.publishers[this.publishers.length - 1])
+      Vue.nextTick(() => {
+        const publisher = OT.initPublisher(el, { name: this.username })
+        this.publishers.push(publisher)
+        this.session.publish(this.publishers[this.publishers.length - 1])
+      })
     },
     connectToSession(apiKey, session, token) {
       return new Promise((resolve, reject) => {
@@ -60,10 +62,10 @@ const app = new Vue({
       })
     },
     async joinTable(id) {
+      this.view = 'table'
       const { token, session, apiKey } = await this.createToken(id)
       await this.connectToSession(apiKey, session, token)
       this.createPublisher()
-      this.view = 'table'
     },
     async returnToLobby() {
       this.session.disconnect()
@@ -75,14 +77,14 @@ const app = new Vue({
       }
     },
     async enterStage(event, speaker = false) {
+      this.view = 'stage'
       const password = speaker ? prompt('Speaker access code') : false
       const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
       await this.connectToSession(apiKey, session, token)
       if (password) {
-        this.createPublisher(token, 'stage')
+        this.createPublisher()
         this.speaker = true
       }
-      this.view = 'stage'
     }
   }
 })
