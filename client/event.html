@@ -32,6 +32,9 @@
           <button @click="returnToLobby">Return to lobby</button>
           <div id="publishers"></div>
           <div id="subscribers"></div>
+          <div class="controls" v-if="speaker">
+            <h3>Speaker Controls</h3>
+          </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>

@@ -19,6 +19,7 @@ const app = new Vue({
     event: false,
     session: false,
     username: false,
+    speaker: false,
     view: 'lobby', // 'lobby', 'table', 'stage'
     publishers: [],
     subscribers: []
@@ -54,6 +55,9 @@ const app = new Vue({
           nameDisplayMode: 'on'
         })
       })
+      this.session.on('streamDestroyed', event => {
+        this.subscribers = this.subscribers.filter(s => s.id != event.stream.id)
+      })
     },
     async joinTable(id) {
       const { token, session, apiKey } = await this.createToken(id)
@@ -74,7 +78,10 @@ const app = new Vue({
       const password = speaker ? prompt('Speaker access code') : false
       const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
       await this.connectToSession(apiKey, session, token)
-      if (password) this.createPublisher(token, 'stage')
+      if (password) {
+        this.createPublisher(token, 'stage')
+        this.speaker = true
+      }
       this.view = 'stage'
     }
   }
