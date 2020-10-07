@@ -38,13 +38,13 @@ const app = new Vue({
         resolve(data)
       })
     },
-    async joinTable(id, password = false) {
+    async joinTable(id) {
       const { token, session, apiKey } = await this.createToken(id)
       this.session = OT.initSession(apiKey, session)
       this.createPublisher(token)
       this.session.on('streamCreated', this.streamCreated)
     },
-    createPublisher(token, el = 'publisher') {
+    createPublisher(token, el = 'publishers') {
       this.publishers.push(OT.initPublisher(el, { name: this.username }))
       this.session.connect(token, err => {
         if (err) return console.error(err)
@@ -53,7 +53,6 @@ const app = new Vue({
     },
     streamCreated(event, el = 'subscribers') {
       this.subscribers.push(event.stream)
-      console.log(event)
       this.session.subscribe(event.stream, el, {
         nameDisplayMode: 'on'
       })
@@ -68,31 +67,15 @@ const app = new Vue({
       }
     },
     async enterStage(event, speaker = false) {
-      if (!speaker) {
-        const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage')
-        this.session = OT.initSession(apiKey, session)
-        this.session.connect(token)
-        this.session.on('streamCreated', event => {
-          this.streamCreated(event, 'stage-subscribers')
-        })
-        this.onStage = true
-      } else {
-        const password = prompt('Speaker access code')
-        const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
-        if (error) {
-          return alert(error)
-        } else {
-          this.session = OT.initSession(apiKey, session)
-          const camera = this.createPublisher(token, 'stage-publishers')
-          this.session.connect(token, () => {
-            this.session.publish(camera)
-          })
-          this.session.on('streamCreated', event => {
-            this.streamCreated(event, 'stage-subscribers')
-          })
-          this.onStage = true
-        }
-      }
+      const password = speaker ? prompt('Speaker access code') : false
+      const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
+      this.session = OT.initSession(apiKey, session)
+      if (password) this.createPublisher(token, 'stage-publishers')
+      else this.session.connect(token)
+      this.session.on('streamCreated', event => {
+        this.streamCreated(event, 'stage-subscribers')
+      })
+      this.onStage = true
     }
   }
 })
