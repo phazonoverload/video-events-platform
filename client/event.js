@@ -19,14 +19,9 @@ const app = new Vue({
     event: false,
     session: false,
     username: false,
-    onStage: false,
+    view: 'lobby', // 'lobby', 'table', 'stage'
     publishers: [],
-    subscribers: [],
-    stage: {
-      publishers: [],
-      subscribers: [],
-      accessed: false
-    }
+    subscribers: []
   },
   methods: {
     createToken(session, stage = false, password = false) {
@@ -38,29 +33,38 @@ const app = new Vue({
         resolve(data)
       })
     },
-    async joinTable(id) {
-      const { token, session, apiKey } = await this.createToken(id)
-      this.session = OT.initSession(apiKey, session)
-      this.createPublisher(token)
-      this.session.on('streamCreated', this.streamCreated)
+    createPublisher(el = 'publishers') {
+      const publisher = OT.initPublisher(el, { name: this.username })
+      this.publishers.push(publisher)
+      this.session.publish(this.publishers[this.publishers.length - 1])
     },
-    createPublisher(token, el = 'publishers') {
-      this.publishers.push(OT.initPublisher(el, { name: this.username }))
-      this.session.connect(token, err => {
-        if (err) return console.error(err)
-        this.session.publish(this.publishers[0])
+    connectToSession(apiKey, session, token) {
+      return new Promise((resolve, reject) => {
+        this.session = OT.initSession(apiKey, session)
+        this.session.connect(token, err => {
+          this.streamCreated()
+          err ? reject(err) : resolve()
+        })
       })
     },
     streamCreated(event, el = 'subscribers') {
-      this.subscribers.push(event.stream)
-      this.session.subscribe(event.stream, el, {
-        nameDisplayMode: 'on'
+      this.session.on('streamCreated', event => {
+        this.subscribers.push(event.stream)
+        this.session.subscribe(event.stream, el, {
+          nameDisplayMode: 'on'
+        })
       })
     },
-    async leaveTable() {
+    async joinTable(id) {
+      const { token, session, apiKey } = await this.createToken(id)
+      await this.connectToSession(apiKey, session, token)
+      this.createPublisher()
+      this.view = 'table'
+    },
+    async returnToLobby() {
       this.session.disconnect()
       this.session = false
-      this.onStage = false
+      this.view = 'lobby'
       for (let i in this.publishers) {
         this.publishers[i].destroy()
         this.publishers.splice(i, 1)
@@ -69,13 +73,9 @@ const app = new Vue({
     async enterStage(event, speaker = false) {
       const password = speaker ? prompt('Speaker access code') : false
       const { token, session, apiKey, error } = await this.createToken(this.event.stage.id, 'stage', password)
-      this.session = OT.initSession(apiKey, session)
-      if (password) this.createPublisher(token, 'stage-publishers')
-      else this.session.connect(token)
-      this.session.on('streamCreated', event => {
-        this.streamCreated(event, 'stage-subscribers')
-      })
-      this.onStage = true
+      await this.connectToSession(apiKey, session, token)
+      if (password) this.createPublisher(token, 'stage')
+      this.view = 'stage'
     }
   }
 })
