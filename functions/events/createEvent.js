@@ -18,8 +18,8 @@ module.exports = async (event, context) => {
       }
     } else {
       const sessions = []
-      for (let i = 1; i <= tables; i++) {
-        sessions.push(await createSession(i))
+      for (let table of tables) {
+        sessions.push(await createSession(table))
       }
       await events.insertOne({
         name,
@@ -40,11 +40,11 @@ module.exports = async (event, context) => {
   }
 }
 
-const createSession = async i => {
+const createSession = async name => {
   return new Promise((resolve, reject) => {
     OT.createSession((error, session) => {
       resolve({
-        name: i ? 'Table ' + i : 'Stage',
+        name,
         id: session.sessionId,
         members: []
       })

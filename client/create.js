@@ -1,7 +1,10 @@
 const app = new Vue({
   el: '#app',
   data: {
-    event: {}
+    event: {
+      tables: []
+    },
+    tableName: ''
   },
   methods: {
     async createEvent() {
@@ -16,6 +19,14 @@ const app = new Vue({
           if (res.error) return alert(res.error)
           alert(res.message)
         })
+    },
+    addTable(event) {
+      event.preventDefault()
+      this.event.tables.push(this.tableName)
+      this.tableName = ''
+    },
+    deleteTable(i) {
+      this.event.tables.splice(i, 1)
     }
   }
 })

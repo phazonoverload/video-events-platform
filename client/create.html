@@ -17,16 +17,24 @@
           <input type="text" id="slug" v-model="event.code" />
         </div>
         <div class="input-group">
-          <label for="tables">Number of Tables</label>
-          <input type="number" id="tables" v-model="event.tables" />
-        </div>
-        <div class="input-group">
           <label for="speaker">Speaker Access Code</label>
           <input type="text" id="speaker" v-model="event.speaker" />
         </div>
         <div class="input-group">
           <label for="welcome">Welcome Text</label>
           <input type="text" id="welcome" v-model="event.welcome" />
+        </div>
+        <div class="input-group" style="border: 1px solid black; padding: 1em 0 0.5em 1em; margin: 1em 0">
+          <label>Add New Table</label>
+          <div class="table">
+            <input id="table" type="text" v-model="tableName" />
+            <button @click="addTable">Add</button>
+          </div>
+          <ul>
+            <li v-for="(table, i) in event.tables">
+              {{table}} <span @click="deleteTable(i)" style="color: red">x</span>
+            </li>
+          </ul>
         </div>
         <button>Create Event</button>
       </form>
